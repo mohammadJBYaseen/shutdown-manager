@@ -97,7 +97,13 @@ func (s *shutdownManagerWithCallBackImpl) StartListner() error {
 		s.waitGroup.Add(1)
 		go func(hookIndex int, hookFn func(context.Context) error) {
 			defer s.waitGroup.Done()
-
+			defer func() {
+				if r := recover(); r != nil {
+					err := fmt.Errorf("panic in hook %d: %v", hookIndex, r)
+					log.Error().Msg(err.Error())
+				}
+			}()
+	
 			if err := hookFn(ctx); err != nil {
 				log.Error().Msgf("Error in shutdown hook %d: %v\n", hookIndex, err)
 			}
@@ -114,8 +120,8 @@ func (s *shutdownManagerWithCallBackImpl) StartListner() error {
 	case <-done:
 		log.Debug().Msgf("All shutdown hooks completed successfully")
 	case <-ctx.Done():
-		log.Debug().Msgf("Global shutdown timeout exceeded")
-		return fmt.Errorf("global shutdown timeout exceeded")
+		log.Debug().Msgf("Shutdown timeout exceeded")
+		return fmt.Errorf("shutdown timeout exceeded")
 	}
 	return nil
 }
@@ -190,9 +196,9 @@ func (s *shutdownManagerWithSignalsImp) StartListner() error {
 			log.Debug().Msgf("Service %s shutdown successfully (%d/%d complete)\n",
 				serviceName, completed, totalServices)
 		case <-ctx.Done():
-			log.Debug().Msgf("Global shutdown timeout exceeded. Only %d/%d services completed\n",
+			log.Debug().Msgf("Shutdown timeout exceeded. Only %d/%d services completed\n",
 				completed, totalServices)
-			return fmt.Errorf("global shutdown timeout exceeded. Only %d/%d services completed",
+			return fmt.Errorf("shutdown timeout exceeded. Only %d/%d services completed",
 				completed, totalServices)
 		}
 	}
