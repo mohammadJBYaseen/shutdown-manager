@@ -1,6 +1,6 @@
 module yaseen.com/shutdown-manager
 
-go 1.23.4
+go 1.23
 
 require github.com/rs/zerolog v1.33.0
 
