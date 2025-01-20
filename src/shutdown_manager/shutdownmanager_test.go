@@ -73,7 +73,10 @@ func Test_shutdownManagerWithSignalsImp_Shutdown_Successfully(t *testing.T) {
 	go func() {
 		time.Sleep(time.Second * 1)
 		log.Debug().Msgf("Simulating SIG INT signal.")
-		syscall.Kill(syscall.Getpid(), syscall.SIGINT)
+		err := syscall.Kill(syscall.Getpid(), syscall.SIGINT)
+		if err != nil {
+			panic("Can't send cancel signal")
+		}
 	}()
 	// Handle shutdown
 	err := shutdownmanager.StartListner()
@@ -145,7 +148,10 @@ func Test_shutdownManagerWithSignalsImp_Shutdown_Failed_Timeouted(t *testing.T) 
 	go func() {
 		time.Sleep(time.Second * 1)
 		log.Debug().Msgf("Simulating SIG INT signal.")
-		syscall.Kill(syscall.Getpid(), syscall.SIGINT)
+		err := syscall.Kill(syscall.Getpid(), syscall.SIGINT)
+		if err != nil {
+			panic("Can't send cancel signal")
+		}
 	}()
 	// Handle shutdown
 	err := shutdownmanager.StartListner()
@@ -221,7 +227,10 @@ func Test_shutdownManagerWithSignalsImp_Shutdown_Successfully_Even_Hook_Failed_F
 	go func() {
 		time.Sleep(time.Second * 1)
 		log.Debug().Msgf("Simulating SIG INT signal.")
-		syscall.Kill(syscall.Getpid(), syscall.SIGINT)
+		err := syscall.Kill(syscall.Getpid(), syscall.SIGINT)
+		if err != nil {
+			panic("Can't send cancel signal")
+		}
 	}()
 	// Handle shutdown
 	err := shutdownmanager.StartListner()
@@ -263,7 +272,10 @@ func Test_shutdownManagerWithSignalsImp_Shutdown_Successfully_Even_Hook_Failed(t
 	go func() {
 		time.Sleep(time.Second * 1)
 		log.Debug().Msgf("Simulating SIG INT signal.")
-		syscall.Kill(syscall.Getpid(), syscall.SIGINT)
+		err := syscall.Kill(syscall.Getpid(), syscall.SIGINT)
+		if err != nil {
+			panic("Can't send cancel signal")
+		}
 	}()
 	// Handle shutdown
 	err := shutdownmanager.StartListner()
@@ -305,7 +317,10 @@ func Test_shutdownManagerWithCallBackImpl_Shutdown_Successfully(t *testing.T) {
 	go func() {
 		time.Sleep(time.Second * 1)
 		log.Debug().Msgf("Simulating SIG INT signal.")
-		syscall.Kill(syscall.Getpid(), syscall.SIGINT)
+		err := syscall.Kill(syscall.Getpid(), syscall.SIGINT)
+		if err != nil {
+			panic("Can't send cancel signal")
+		}
 	}()
 	// Handle shutdown
 	err := shutdownmanager.StartListner()
@@ -347,7 +362,10 @@ func Test_shutdownManagerWithCallBackImpl_Shutdown_Failed_Timeouted(t *testing.T
 	go func() {
 		time.Sleep(time.Second * 1)
 		log.Debug().Msgf("Simulating SIG INT signal.")
-		syscall.Kill(syscall.Getpid(), syscall.SIGINT)
+		err := syscall.Kill(syscall.Getpid(), syscall.SIGINT)
+		if err != nil {
+			panic("Can't send cancel signal")
+		}
 	}()
 	// Handle shutdown
 	err := shutdownmanager.StartListner()
@@ -376,7 +394,6 @@ func Test_shutdownManagerWithCallBackImpl_Shutdown_Successfully_Event_Hook_Faile
 		log.Debug().Msgf("Worker: Finishing pending tasks...")
 		time.Sleep(200 * time.Millisecond) // Simulate cleanup work
 		panic("Failed to close worker")
-		return nil
 	})
 
 	// Simulate cache service
@@ -390,7 +407,10 @@ func Test_shutdownManagerWithCallBackImpl_Shutdown_Successfully_Event_Hook_Faile
 	go func() {
 		time.Sleep(time.Second * 1)
 		log.Debug().Msgf("Simulating SIG INT signal.")
-		syscall.Kill(syscall.Getpid(), syscall.SIGINT)
+		err := syscall.Kill(syscall.Getpid(), syscall.SIGINT)
+		if err != nil {
+			panic("Can't send cancel signal")
+		}
 	}()
 	// Handle shutdown
 	err := shutdownmanager.StartListner()
@@ -432,7 +452,10 @@ func Test_shutdownManagerWithCallBackImpl_Shutdown_Successfully_Event_Hook_Faile
 	go func() {
 		time.Sleep(time.Second * 1)
 		log.Debug().Msgf("Simulating SIG INT signal.")
-		syscall.Kill(syscall.Getpid(), syscall.SIGINT)
+		err := syscall.Kill(syscall.Getpid(), syscall.SIGINT)
+		if err != nil {
+			panic("Can't send cancel signal")
+		}
 	}()
 	// Handle shutdown
 	err := shutdownmanager.StartListner()
