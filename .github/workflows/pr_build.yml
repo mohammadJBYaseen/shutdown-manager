@@ -37,7 +37,7 @@ jobs:
       
     - name: List files in the repository
       run: |
-          ls -al .
+          ls -al ./.github
 
     - name: Build
       id: build
