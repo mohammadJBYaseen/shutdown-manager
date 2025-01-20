@@ -25,3 +25,7 @@ go get https://github.com/mohammadJBYaseen/shutdown-manager
 ## Contributing
 
 Feel free to fork this repository and submit pull requests. All contributions are welcome!
+
+## License
+
+See the [LICENSE](LICENSE.md) file for license rights and limitations (MIT).
