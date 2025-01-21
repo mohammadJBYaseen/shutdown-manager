@@ -1,4 +1,4 @@
-module yaseen.com/shutdown-manager
+module mohammadJBYaseen/shutdown-manager
 
 go 1.23.5
 
