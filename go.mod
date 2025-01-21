@@ -1,4 +1,4 @@
-module mohammadJBYaseen/shutdown-manager
+module github.com/mohammadJBYaseen/shutdown-manager
 
 go 1.23.5
 
