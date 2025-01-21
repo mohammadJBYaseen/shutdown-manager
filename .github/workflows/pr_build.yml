@@ -53,3 +53,4 @@ jobs:
       uses: vladopajic/go-test-coverage@v2.11.2
       with:
         config: ./.testcoverage.yaml
+        profile: cover.out
