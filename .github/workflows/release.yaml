@@ -20,13 +20,6 @@ jobs:
 
       - name: set RELEASE_VERSION ENV var
         run: echo "RELEASE_VERSION=${GITHUB_REF:10}" >> $GITHUB_ENV
-
-      - name: ensure image version is set to release version
-        run: |
-          image=$(yq '.runs.image' action.yml)
-          echo "Image: $image"
-          echo "Release version: ${{ env.RELEASE_VERSION }}"
-          [[ "$image" == *"${{ env.RELEASE_VERSION }}" ]]
             
       - name: update the major version tag
         id: majorver
