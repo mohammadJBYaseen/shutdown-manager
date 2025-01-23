@@ -18,29 +18,10 @@ jobs:
         with:
           go-version-file: go.mod
 
-      - name: set RELEASE_VERSION ENV var
-        run: echo "RELEASE_VERSION=${GITHUB_REF:10}" >> $GITHUB_ENV
-            
-      - name: update the major version tag
-        id: majorver
-        uses: actions/publish-action@v0.3.0
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@master
         with:
-          source-tag: ${{ env.RELEASE_VERSION }}
-
-      - name: login to GitHub container registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: build and push
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          build-args: |
-            VERSION=${{ env.RELEASE_VERSION }}
-          tags: |
-            ghcr.io/mohammadJBYaseen/shutdown-manager:${{ env.RELEASE_VERSION }}
-            ghcr.io/mohammadJBYaseen/shutdown-manager:${{ steps.majorver.outputs.major-tag }}
-            ghcr.io/mohammadJBYaseen/shutdown-manager:latest
+          version: latest
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
