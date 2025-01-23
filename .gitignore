@@ -27,3 +27,4 @@ go.work.sum
 *.out
 cover.html
 cover.out
+cover.profile
