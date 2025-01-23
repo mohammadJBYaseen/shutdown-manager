@@ -37,6 +37,7 @@ type (
 		waitGroup       sync.WaitGroup
 		shutdownSignals []os.Signal
 		started         bool
+		mu              sync.RWMutex
 	}
 
 	Service struct {
@@ -49,7 +50,8 @@ type (
 		services        []Service
 		timeout         time.Duration
 		shutdownSignals []os.Signal
-		started        bool
+		started         bool
+		mu              sync.RWMutex
 	}
 )
 
@@ -57,7 +59,7 @@ func NewShutdownManagerWithCallBack(ShutdownManagerProperties ShutdownManagerPro
 	return &shutdownManagerWithCallBackImpl{
 		timeout:         ShutdownManagerProperties.WaitTimeout,
 		shutdownSignals: ShutdownManagerProperties.ShutdownSignals,
-		started:        false,
+		started:         false,
 	}
 }
 
@@ -65,15 +67,19 @@ func NewShutdownManagerWithSignals(ShutdownManagerProperties ShutdownManagerProp
 	return &shutdownManagerWithSignalsImp{
 		timeout:         ShutdownManagerProperties.WaitTimeout,
 		shutdownSignals: ShutdownManagerProperties.ShutdownSignals,
-		started:        false,
+		started:         false,
 	}
 }
 
 func (sm *shutdownManagerWithCallBackImpl) RegisterHook(hook func(context.Context) error) {
+	sm.mu.Lock()
+	defer sm.mu.Unlock()
 	sm.hooks = append(sm.hooks, hook)
 }
 
 func (s *shutdownManagerWithCallBackImpl) StartListner() error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	if s.started {
 		return fmt.Errorf("shutdown manager already started")
 	}
@@ -103,7 +109,7 @@ func (s *shutdownManagerWithCallBackImpl) StartListner() error {
 					log.Error().Msg(err.Error())
 				}
 			}()
-	
+
 			if err := hookFn(ctx); err != nil {
 				log.Error().Msgf("Error in shutdown hook %d: %v\n", hookIndex, err)
 			}
@@ -127,6 +133,8 @@ func (s *shutdownManagerWithCallBackImpl) StartListner() error {
 }
 
 func (s *shutdownManagerWithSignalsImp) RegisterService(name string) (shutdown, done chan struct{}) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	shutdown = make(chan struct{})
 	done = make(chan struct{})
 
@@ -139,13 +147,17 @@ func (s *shutdownManagerWithSignalsImp) RegisterService(name string) (shutdown, 
 	return shutdown, done
 }
 
-func (s *shutdownManagerWithSignalsImp) fanIn(done ...chan struct{}) chan string {
+func (s *shutdownManagerWithSignalsImp) fanIn(ctx context.Context, done ...chan struct{}) chan string {
 	multiplexed := make(chan string)
 
 	for i, ch := range done {
 		go func(serviceIndex int, serviceDone chan struct{}) {
-			<-serviceDone
-			multiplexed <- s.services[serviceIndex].name
+			select {
+			case <-serviceDone:
+				multiplexed <- s.services[serviceIndex].name
+			case <-ctx.Done(): // Exit on context cancellation
+				return
+			}
 		}(i, ch)
 	}
 
@@ -153,6 +165,8 @@ func (s *shutdownManagerWithSignalsImp) fanIn(done ...chan struct{}) chan string
 }
 
 func (s *shutdownManagerWithSignalsImp) StartListner() error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	if s.started {
 		return fmt.Errorf("shutdown manager already started")
 	}
@@ -174,6 +188,7 @@ func (s *shutdownManagerWithSignalsImp) StartListner() error {
 
 	for _, service := range s.services {
 		log.Debug().Msgf("Signaling shutdown for service: %s\n", service.name)
+		service := service // create local copy of service
 		go func() {
 			close(service.shutdown)
 		}()
@@ -184,7 +199,7 @@ func (s *shutdownManagerWithSignalsImp) StartListner() error {
 		doneChannels[i] = service.done
 	}
 
-	multiplexed := s.fanIn(doneChannels...)
+	multiplexed := s.fanIn(ctx, doneChannels...)
 
 	completed := 0
 	totalServices := len(s.services)

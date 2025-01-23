@@ -9,7 +9,12 @@ import (
 	"time"
 
 	"github.com/rs/zerolog/log"
+	"go.uber.org/goleak"
 )
+
+func TestMain(m *testing.M) {
+	goleak.VerifyTestMain(m)
+}
 
 func Test_shutdownManagerWithSignalsImp_Shutdown_Successfully(t *testing.T) {
 
@@ -161,14 +166,12 @@ func Test_shutdownManagerWithSignalsImp_Shutdown_Failed_Timeouted(t *testing.T) 
 	}
 }
 
-
 func Test_shutdownManagerWithSignalsImp_Shutdown_Successfully_Even_Hook_Failed_For_UnexpectedErrors(t *testing.T) {
 
 	shutdownmanager := NewShutdownManagerWithSignals(ShutdownManagerProperties{
 		WaitTimeout:     time.Duration(time.Millisecond * 500),
 		ShutdownSignals: []os.Signal{syscall.SIGINT, syscall.SIGTERM},
 	})
-
 
 	dbShutdown, dbDone := shutdownmanager.RegisterService("database")
 	workerShutdown, workerDone := shutdownmanager.RegisterService("worker")
