@@ -18,7 +18,3 @@ If it looks fine to you, comment with "LGTM" (Looks good to me).
 If changes are required, notice the reviewers with "PTAL" (Please take another look) after committing the fixes.
 
 Before merging the Pull Request, at least one [team member](https://github.com/mohammadJBYaseen/shutdown-manager?tab=members) must have commented with "LGTM".
-
-## Development Ideas
-
-If you are looking for ideas for code contributions, please check our [Development Ideas](https://github.com/mohammadJBYaseen/shutdown-manager/wiki/Development-Ideas) Wiki page.
