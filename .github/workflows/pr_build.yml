@@ -51,7 +51,7 @@ jobs:
 
     - name: Check test coverage
       if: steps.test.outcome == 'success'
-      uses: vladopajic/go-test-coverage@v2.13.1
+      uses: vladopajic/go-test-coverage@v2.14.3
       with:
         config: ./.testcoverage.yaml
         profile: cover.out
